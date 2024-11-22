@@ -1,0 +1,8 @@
+pywin32
+psutil
+
+build
+twine
+
+-i https://test.pypi.org/simple/
+winytils

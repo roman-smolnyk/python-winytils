@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "winytils"
+version = "0.0.1"
+authors = [
+  { name="Roman Smolnyk", email="poma23324@gmail.com" },
+]
+description = "Windows OS utils package"
+readme = "README.md"
+requires-python = ">=3.8" # Optional
+keywords = ["windows", "private", "utils"] # Optional
+classifiers = [  # Optional
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "pywin32",
+    "psutil",
+]
+
+[project.urls]  # Optional
+Homepage = "https://gitlab.com/roman-smolnyk/python-windows-utils"
