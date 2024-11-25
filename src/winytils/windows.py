@@ -1,3 +1,4 @@
+import sys
 import time
 from typing import Callable, List
 
@@ -7,6 +8,13 @@ import win32api
 import win32con
 import win32gui
 import win32process
+
+from .utils import _get_window_icon
+
+try:
+    from PIL import Image
+except:
+    pass
 
 
 class Window:
@@ -23,6 +31,12 @@ class Window:
     @property
     def process(self) -> psutil.Process:
         return psutil.Process(self._process_id)
+
+    @property
+    def icon(self) -> "Image":
+        if "PIL.Image" not in sys.modules:
+            raise ImportError("Missing Pillow lib")
+        return _get_window_icon(self.hwnd)
 
     @property
     def class_name(self) -> str:

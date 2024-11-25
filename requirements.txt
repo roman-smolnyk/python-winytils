@@ -1,5 +1,6 @@
 pywin32
 psutil
+Pillow
 
 build
 twine
