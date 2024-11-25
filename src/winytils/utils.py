@@ -46,13 +46,11 @@ def _get_bitmap_bits(hbm, width, height):
 
 
 def _get_window_icon(hwnd) -> Image:
-    # NEVER SEEN THIS ICON BEEN FOUND
     h_icon = win32gui.SendMessage(hwnd, win32con.WM_GETICON, win32con.ICON_BIG, 0)
     if not h_icon:
-        # NEVER SEEN THIS ICON BEEN FOUND
         h_icon = win32gui.SendMessage(hwnd, win32con.WM_GETICON, win32con.ICON_SMALL, 0)
     if not h_icon:
-        # ALWAYS FOUND THIS OR NONE
+        # In most cases this thing works. .Returnes 40x40 image
         h_icon = ctypes.windll.user32.GetClassLongPtrW(hwnd, win32con.GCL_HICON)
     if not h_icon:
         raise ValueError("No icon found for this window.")
@@ -83,7 +81,7 @@ def _get_window_icon(hwnd) -> Image:
     win32gui.DeleteDC(hdc_mem)
     win32gui.ReleaseDC(0, hdc)
 
-    return img
+    return img.resize((40, 40))
 
 
 # import win32gui

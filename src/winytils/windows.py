@@ -36,7 +36,10 @@ class Window:
     def icon(self) -> "Image":
         if "PIL.Image" not in sys.modules:
             raise ImportError("Missing Pillow lib")
-        return _get_window_icon(self.hwnd)
+        try:
+            return _get_window_icon(self.hwnd)
+        except:
+            return None
 
     @property
     def class_name(self) -> str:
