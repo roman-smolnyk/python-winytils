@@ -356,6 +356,24 @@ def set_window_overrideredirect(hwnd):
     win32gui.SetWindowPos(hwnd, None, 0, 0, 0, 0, flags)
 
 
+def set_window_transparency(hwnd, transparency: int):
+    """
+    Set the transparency level of a window.
+    :param hwnd: Handle to the window.
+    :param transparency: Transparency level (0-255). 255 is fully opaque, 0 is fully transparent.
+    """
+    # Get the current window styles
+    ex_style = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
+
+    # Add layered window style if not already set
+    if not (ex_style & win32con.WS_EX_LAYERED):
+        ex_style |= win32con.WS_EX_LAYERED
+        win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, ex_style)
+
+    # ctypes.windll.user32.SetLayeredWindowAttributes(hwnd, color_key, 0, win32con.LWA_COLORKEY)
+    win32gui.SetLayeredWindowAttributes(hwnd, 0, transparency, win32con.LWA_ALPHA)
+
+
 if __name__ == "__main__":
     # time.sleep(3)
     # windows = Windows.filter(has_gui=True, opened=True, has_title=True, custom_filter=windows_filter)

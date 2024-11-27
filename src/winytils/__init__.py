@@ -3,4 +3,4 @@ from . import privileges
 from . import windows
 
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
