@@ -1,6 +1,6 @@
-from . import pc_state
+from . import machine_state_watcher
 from . import privileges
 from . import windows
 
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"

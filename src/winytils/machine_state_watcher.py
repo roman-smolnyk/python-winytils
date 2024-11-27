@@ -3,23 +3,13 @@ import time
 from collections import defaultdict
 from datetime import datetime
 from enum import Enum
+from typing import Callable
 
 import psutil
 import win32api
 import win32con
 import win32gui
 import win32ts
-
-
-def get_system_boot_time():
-    """
-    Retrieves the system boot time using psutil.
-
-    :return: A datetime object representing the boot time.
-    """
-    boot_timestamp = psutil.boot_time()
-    boot_dt = datetime.fromtimestamp(boot_timestamp)
-    return boot_dt
 
 
 class SessionEvent(Enum):
@@ -108,37 +98,22 @@ class WorkstationMonitor:
 
 
 class MachineStateScanner(threading.Thread):
+    # fmt:off
+    __slots__ = ("wm", "locked", "unlocked", "on_lock_func", "on_lock_args", "on_lock_kwargs", "on_unlock_func", "on_unlock_args", "on_unlock_kwargs", "_t_lock")
+    # fmt:on
+
     def __init__(self):
         super().__init__()
-        self.locked = False
-        self.unlocked = False
-        self.on_lock_func = None
-        self.on_unlock_func = None
-
-    def on_lock(self, func: callable, *args, **kwargs):
-        """Sets the lock handler."""
-        self.on_lock_func = func
-        self.on_lock_args = args
-        self.on_lock_kwargs = kwargs
-
-    def on_unlock(self, func: callable, *args, **kwargs):
-        """Sets the unlock handler."""
-        self.on_unlock_func = func
-        self.on_unlock_args = args
-        self.on_unlock_kwargs = kwargs
-
-    def handler(self, event, session_id):
-        """Main event handler for lock/unlock events."""
-        if event == SessionEvent.SESSION_LOCK:
-            self.locked = True
-            self.unlocked = False
-            if self.on_lock_func:
-                self.on_lock_func(*self.on_lock_args, **self.on_lock_kwargs)
-        elif event == SessionEvent.SESSION_UNLOCK:
-            self.locked = False
-            self.unlocked = True
-            if self.on_unlock_func:
-                self.on_unlock_func(*self.on_unlock_args, **self.on_unlock_kwargs)
+        self.wm = None
+        self.locked: bool = False
+        self.unlocked: bool = False
+        self.on_lock_func: callable = None
+        self.on_lock_args = []
+        self.on_lock_kwargs = {}
+        self.on_unlock_func: callable = None
+        self.on_unlock_args = []
+        self.on_unlock_kwargs = {}
+        self._t_lock = threading.Lock()
 
     def run(self):
         """Run method for the thread, used to start the listener."""
@@ -150,8 +125,72 @@ class MachineStateScanner(threading.Thread):
         """Stop the workstation monitor."""
         self.wm.stop()
 
+    def on_lock(self, func: callable, *args, **kwargs):
+        """Sets the lock handler."""
+        with self._t_lock:
+            self.on_lock_func = func
+            self.on_lock_args = args
+            self.on_lock_kwargs = kwargs
 
-def handler(event, session_id):
+    def on_unlock(self, func: callable, *args, **kwargs):
+        """Sets the unlock handler."""
+        with self._t_lock:
+            self.on_unlock_func = func
+            self.on_unlock_args = args
+            self.on_unlock_kwargs = kwargs
+
+    def handler(self, event, session_id):
+        """Main event handler for lock/unlock events."""
+        with self._t_lock:
+            if event == SessionEvent.SESSION_LOCK:
+                self.locked = True
+                self.unlocked = False
+                if self.on_lock_func:
+                    self.on_lock_func(*self.on_lock_args, **self.on_lock_kwargs)
+            elif event == SessionEvent.SESSION_UNLOCK:
+                self.locked = False
+                self.unlocked = True
+                if self.on_unlock_func:
+                    self.on_unlock_func(*self.on_unlock_args, **self.on_unlock_kwargs)
+
+
+def watch_lock_unlock(
+    thread=None,
+    on_lock=lambda: print(f"locked {datetime.now()}"),
+    on_unlock=lambda: print(f"unlocked {datetime.now()}"),
+    *args,
+    **kwargs,
+):
+    """
+    thread: StoppableThread
+    """
+    ms = MachineStateScanner()
+    ms.start()
+    try:
+        already_locked = False
+        already_unlocked = False
+        while True:
+
+            if thread and getattr(thread, "is_stopped", threading.Event()).is_set():
+                raise Exception("Stopped")
+
+            if ms.locked:
+                if not already_locked:
+                    on_lock(*args, **kwargs)
+                    already_locked = True
+                    already_unlocked = False
+            elif ms.unlocked:
+                if not already_unlocked:
+                    on_unlock(*args, **kwargs)
+                    already_unlocked = True
+                    already_locked = False
+            time.sleep(0.1)
+    except Exception:
+        ms.stop()
+        ms.join()
+
+
+def _handler(event, session_id):
     """Simple handler for lock/unlock events."""
     if event == SessionEvent.SESSION_LOCK:
         print("Session Locked")
@@ -159,28 +198,18 @@ def handler(event, session_id):
         print("Session Unlocked")
 
 
-def on_lock():
-    """Custom lock handler."""
-    print("Custom Lock Handler")
-
-
-def on_unlock(text):
-    """Custom unlock handler."""
-    print(f"Custom Unlock Handler: {text}")
-
-
-def example0():
+def _example_1():
     """Example for basic event listening."""
     wm = WorkstationMonitor()
-    wm.register_handler(SessionEvent.ANY, handler=handler)
+    wm.register_handler(SessionEvent.ANY, handler=_handler)
     wm.listen()
 
 
-def example1():
+def _example_2():
     """TaskScheduler example with custom lock/unlock handlers."""
     ms = MachineStateScanner()
-    ms.on_lock(on_lock)
-    ms.on_unlock(on_unlock, "Hello from unlock!")
+    ms.on_lock(lambda: print(f"locked {datetime.now()}"))
+    ms.on_unlock(lambda: print(f"unlocked {datetime.now()}"))
     ms.start()
     try:
         ms.join()
@@ -190,29 +219,11 @@ def example1():
         ms.join()
 
 
-def example2():
-    """Another example demonstrating manual state checking."""
-    ms = MachineStateScanner()
-    ms.start()
-    try:
-        already_locked = False
-        already_unlocked = False
-        while True:
-            if ms.locked:
-                if not already_locked:
-                    print("System Locked - Example2")
-                    already_locked = True
-                    already_unlocked = False
-            elif ms.unlocked:
-                if not already_unlocked:
-                    print("System Unlocked - Example2")
-                    already_unlocked = True
-                    already_locked = False
-            time.sleep(0.5)
-    except KeyboardInterrupt:
-        print("Stopping...")
-        ms.stop()
+def get_system_boot_time():
+    boot_timestamp = psutil.boot_time()
+    boot_dt = datetime.fromtimestamp(boot_timestamp)
+    return boot_dt
 
 
 if __name__ == "__main__":
-    example2()  # Choose the example you want to run.
+    _example_2()  # Choose the example you want to run.
