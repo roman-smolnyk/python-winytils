@@ -123,7 +123,10 @@ class MachineStateScanner(threading.Thread):
 
     def stop(self):
         """Stop the workstation monitor."""
-        self.wm.stop()
+        try:
+            self.wm.stop()
+        except Exception as e:
+            pass
 
     def on_lock(self, func: callable, *args, **kwargs):
         """Sets the lock handler."""
@@ -171,7 +174,7 @@ def watch_lock_unlock(
         already_unlocked = False
         while True:
 
-            if thread and getattr(thread, "is_stopped", threading.Event()).is_set():
+            if thread and getattr(thread, "is_stopped") and getattr(thread, "is_stopped")():
                 raise Exception("Stopped")
 
             if ms.locked:
@@ -185,7 +188,7 @@ def watch_lock_unlock(
                     already_unlocked = True
                     already_locked = False
             time.sleep(0.1)
-    except Exception:
+    except Exception as e:
         ms.stop()
         ms.join()
 
