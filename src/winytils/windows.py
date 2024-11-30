@@ -1,3 +1,5 @@
+import base64
+import io
 import sys
 import time
 from typing import Callable, List
@@ -40,6 +42,17 @@ class Window:
             return _get_window_icon(self.hwnd)
         except:
             return None
+
+    @property
+    def icon_base64(self) -> str:
+        icon = self.icon
+        if not icon:
+            return None
+        buffer = io.BytesIO()
+        icon.save(buffer, format="PNG")
+        buffer.seek(0)
+        icon_base64 = base64.b64encode(buffer.read()).decode("utf-8")
+        return icon_base64
 
     @property
     def class_name(self) -> str:
