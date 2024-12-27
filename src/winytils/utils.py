@@ -45,7 +45,7 @@ def _get_bitmap_bits(hbm, width, height):
     return buffer.raw
 
 
-def _get_window_icon(hwnd) -> Image:
+def _get_window_icon(hwnd) -> "Image":
     h_icon = win32gui.SendMessage(hwnd, win32con.WM_GETICON, win32con.ICON_BIG, 0)
     if not h_icon:
         h_icon = win32gui.SendMessage(hwnd, win32con.WM_GETICON, win32con.ICON_SMALL, 0)
