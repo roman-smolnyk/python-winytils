@@ -5,23 +5,18 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "winytils"
 version = "0.0.2"
-authors = [
-  { name="Roman Smolnyk", email="poma23324@gmail.com" },
-]
+authors = [{ name = "Roman Smolnyk", email = "poma23324@gmail.com" }]
 description = "Windows OS utils package"
 readme = "README.md"
 requires-python = ">=3.8" # Optional
 keywords = ["windows", "private", "utils"] # Optional
-classifiers = [  # Optional
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+classifiers = [ # Optional
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
 ]
+license = "MIT"
 
-dependencies = [
-    "pywin32",
-    "psutil",
-]
+dependencies = ["pywin32", "psutil"]
 
-[project.urls]  # Optional
+[project.urls] # Optional
 Homepage = "https://github.com/roman-smolnyk/python-winytils"
