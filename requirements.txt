@@ -4,6 +4,3 @@ Pillow
 
 build
 twine
-
--i https://test.pypi.org/simple/
-winytils

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "winytils"
-version = "0.0.9"
+version = "0.0.1"
 authors = [
   { name="Roman Smolnyk", email="poma23324@gmail.com" },
 ]
@@ -24,4 +24,4 @@ dependencies = [
 ]
 
 [project.urls]  # Optional
-Homepage = "https://gitlab.com/roman-smolnyk/python-windows-utils"
+Homepage = "https://github.com/roman-smolnyk/python-winytils"

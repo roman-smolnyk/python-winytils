@@ -1,7 +1,9 @@
 # Python set of utils for Windows OS
 
-My set of custom utils that I'm going to use in my projects
+My set of custom windows utils that I'm going to use in my projects
 
-## Package name in PyPi is ytils
+## Install
 
-[winytils](https://test.pypi.org/project/python-windows-utils/#description)
+```bash
+pip install winytils
+```
