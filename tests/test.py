@@ -5,6 +5,7 @@ from time import sleep
 sys.path.append(str(Path(__file__).parent.parent.absolute()))
 
 from src.winytils.windows import Window, Windows
+from src.winytils.workstation import Workstation
 
 
 def test_windows():
@@ -25,5 +26,10 @@ def test2():
         window.icon.save("icon.png")
 
 
+def test3():
+    workstation = Workstation()
+    workstation.lock()
+
+
 if __name__ == "__main__":
-    test2()
+    test3()
