@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from time import sleep
+import time
 
 sys.path.append(str(Path(__file__).parent.parent.absolute()))
 
@@ -14,7 +14,7 @@ def test_windows():
 
 
 def test2():
-    sleep(3)
+    time.sleep(3)
     window = Windows.foregrond()
 
     if window:
@@ -29,6 +29,8 @@ def test2():
 def test3():
     workstation = Workstation()
     workstation.lock()
+    time.sleep(5)
+    print(workstation.is_locked())
 
 
 if __name__ == "__main__":
