@@ -1,4 +1,5 @@
 import ctypes
+import logging
 import time
 import traceback
 from ctypes import wintypes
@@ -6,10 +7,12 @@ from ctypes import wintypes
 import win32con
 import win32gui
 
+logger = logging.getLogger("winytils")
+
 try:
     from PIL import Image
 except:
-    print("Pillow lib is not installed")
+    logger.debug("Pillow lib is not installed")
 
 
 class ICONINFO(ctypes.Structure):
