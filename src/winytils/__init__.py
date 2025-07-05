@@ -6,6 +6,7 @@ from . import workstation_events
 from . import privileges
 from . import windows
 from . import workstation
+from . import win11toast
 
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"

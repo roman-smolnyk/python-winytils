@@ -6,6 +6,7 @@ sys.path.append(str(Path(__file__).parent.parent.absolute()))
 
 from src.winytils.windows import Window, Windows
 from src.winytils.workstation import Workstation
+from src.winytils.win11toast import toast
 
 
 def test_windows():
@@ -31,6 +32,10 @@ def test3():
     workstation.lock()
     time.sleep(5)
     print(workstation.is_locked())
+
+
+def test4():
+    toast("Hello Python🐍")
 
 
 if __name__ == "__main__":

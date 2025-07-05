@@ -7,3 +7,7 @@ My set of custom windows utils that I'm going to use in my projects
 ```bash
 pip install winytils
 ```
+
+## Dependencies
+
+win11toast depends on winrt modules
