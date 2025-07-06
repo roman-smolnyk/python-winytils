@@ -285,7 +285,7 @@ class Windows:
         return found_windows
 
 
-def windows_filter(windows: List[Window]) -> List[Window]:
+def filter_explorer_windows(windows: List[Window]) -> List[Window]:
     """
     Filters all explorer.exe opened windows(taskbar etc.) except "File Explorer" windows
     """
