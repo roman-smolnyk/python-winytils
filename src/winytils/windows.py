@@ -241,7 +241,7 @@ class Windows:
         return windows
 
     @staticmethod
-    def foregrond() -> Window:
+    def foreground() -> Window:
         """"""
         # windows = Windows.filter(has_gui=has_gui, opened=opened, has_title=has_title, custom_filter=custom_filter)
         # return windows[0] if windows[:1] else None

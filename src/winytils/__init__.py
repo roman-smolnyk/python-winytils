@@ -9,4 +9,4 @@ from . import workstation
 from . import win11toast
 
 
-__version__ = "0.0.5"
+__version__ = "0.0.6"

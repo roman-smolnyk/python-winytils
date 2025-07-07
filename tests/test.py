@@ -16,7 +16,7 @@ def test_windows():
 
 def test2():
     time.sleep(3)
-    window = Windows.foregrond()
+    window = Windows.foreground()
 
     if window:
         if window.is_uwp():
