@@ -142,7 +142,7 @@ class Window:
         placement = win32gui.GetWindowPlacement(self.hwnd)
         return placement[1] == win32con.SW_SHOWNORMAL
 
-    def is_visiable(self) -> bool:
+    def is_visible(self) -> bool:
         return win32gui.IsWindowVisible(self.hwnd) == 1
 
     def close(self, verify_timeout: int = None) -> bool:
@@ -218,9 +218,9 @@ class Windows:
         windows = Windows.get_all()
         # Filter windows that have GUI
         if has_gui == True:
-            windows = [w for w in windows if w.is_visiable()]
+            windows = [w for w in windows if w.is_visible()]
         elif has_gui == False:
-            windows = [w for w in windows if not w.is_visiable()]
+            windows = [w for w in windows if not w.is_visible()]
         # Filter winows that are maximized(opened)
         if opened == True:
             windows = [w for w in windows if not w.is_minimized()]
