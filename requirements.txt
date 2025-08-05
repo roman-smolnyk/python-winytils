@@ -5,15 +5,15 @@ Pillow
 winrt-runtime
 winrt-Windows.Data.Xml.Dom
 winrt-Windows.Foundation
-winrt.windows.Foundation.Collections
-winrt-Windows.Globalization
-winrt-Windows.Graphics.Imaging
-winrt-Windows.Media.Core
-winrt-Windows.Media.Ocr
-winrt-Windows.Media.Playback
-winrt-Windows.Media.Speechsynthesis
-winrt-Windows.Storage
-winrt-Windows.Storage.Streams
+# winrt.windows.Foundation.Collections
+# winrt-Windows.Globalization
+# winrt-Windows.Graphics.Imaging
+# winrt-Windows.Media.Core
+# winrt-Windows.Media.Ocr
+# winrt-Windows.Media.Playback
+# winrt-Windows.Media.Speechsynthesis
+# winrt-Windows.Storage
+# winrt-Windows.Storage.Streams
 winrt-Windows.UI.Notifications
 
 build

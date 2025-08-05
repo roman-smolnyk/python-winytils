@@ -12,7 +12,8 @@ logger = logging.getLogger("winytils")
 try:
     from PIL import Image
 except:
-    logger.debug("Pillow lib is not installed")
+    pip = "pip install Pillow"
+    logging.getLogger("winytils").debug(pip)
 
 
 class ICONINFO(ctypes.Structure):
@@ -48,18 +49,27 @@ def _get_bitmap_bits(hbm, width, height):
     return buffer.raw
 
 
-def _get_window_icon(hwnd) -> "Image":
-    h_icon = win32gui.SendMessage(hwnd, win32con.WM_GETICON, win32con.ICON_BIG, 0)
-    if not h_icon:
-        h_icon = win32gui.SendMessage(hwnd, win32con.WM_GETICON, win32con.ICON_SMALL, 0)
-    if not h_icon:
+def _get_hicon(hwnd) -> int:
+    hicon = win32gui.SendMessage(hwnd, win32con.WM_GETICON, win32con.ICON_SMALL, 0)
+
+    if not hicon:
+        hicon = win32gui.SendMessage(hwnd, win32con.WM_GETICON, win32con.ICON_BIG, 0)
+    if not hicon:
+        hicon = ctypes.windll.user32.GetClassLongPtrW(hwnd, win32con.GCL_HICONSM)
+    if not hicon:
         # In most cases this thing works. .Returnes 40x40 image
-        h_icon = ctypes.windll.user32.GetClassLongPtrW(hwnd, win32con.GCL_HICON)
-    if not h_icon:
+        hicon = ctypes.windll.user32.GetClassLongPtrW(hwnd, win32con.GCL_HICON)
+
+    return hicon
+
+
+def get_window_icon(hwnd) -> "Image":
+    hicon = _get_hicon(hwnd)
+    if not hicon:
         raise ValueError("No icon found for this window.")
 
     # Get ICONINFO structure
-    icon_info = _get_icon_info(h_icon)
+    icon_info = _get_icon_info(hicon)
 
     # Extract color and mask bitmaps
     hbm_color = icon_info.hbmColor
@@ -85,71 +95,3 @@ def _get_window_icon(hwnd) -> "Image":
     win32gui.ReleaseDC(0, hdc)
 
     return img.resize((40, 40))
-
-
-# import win32gui
-# import win32ui
-# import win32con
-# import time
-# from PIL import Image
-# import os
-# import ctypes
-
-
-# def get_window_icon(hwnd):
-#     # NEVER SEEN THIS ICON BEEN FOUND
-#     h_icon = win32gui.SendMessage(hwnd, win32con.WM_GETICON, win32con.ICON_BIG, 0)
-#     if not h_icon:
-#         # NEVER SEEN THIS ICON BEEN FOUND
-#         h_icon = win32gui.SendMessage(hwnd, win32con.WM_GETICON, win32con.ICON_SMALL, 0)
-#     if not h_icon:
-#         # ALWAYS FOUND THIS OR NONE
-#         h_icon = ctypes.windll.user32.GetClassLongPtrW(hwnd, win32con.GCL_HICON)
-#     if not h_icon:
-#         raise ValueError("No icon found for this window.")
-
-#     hdc = win32ui.CreateDCFromHandle(win32gui.GetDC(0))
-#     hdc_mem = hdc.CreateCompatibleDC()
-#     bmp = win32ui.CreateBitmap()
-#     bmp.CreateCompatibleBitmap(hdc, 256, 256)  # Allocate enough space for a large icon
-#     hdc_mem.SelectObject(bmp)
-
-#     # Draw the icon into the bitmap
-#     win32gui.DrawIconEx(hdc_mem.GetHandleOutput(), 0, 0, h_icon, 256, 256, 0, None, win32con.DI_NORMAL)
-
-#     # Save the bitmap as an image file
-#     bmp_info = bmp.GetInfo()
-#     bmp_data = bmp.GetBitmapBits(True)
-#     win32gui.DeleteObject(bmp.GetHandle())
-#     hdc_mem.DeleteDC()
-#     hdc.DeleteDC()
-#     image = Image.frombuffer("RGB", (bmp_info["bmWidth"], bmp_info["bmHeight"]), bmp_data, "raw", "BGRX", 0, 1)
-#     return image
-
-
-# def main():
-
-#     from winytils.windows import Windows
-
-#     # Find the target window
-#     # hwnd = win32gui.GetForegroundWindow()
-#     window = Windows.foregrond()
-#     if not window:
-#         print("Window not found!")
-#         return
-
-#     if window.is_uwp():
-#         child = window.uwp_child
-#         if child:
-#             window = child
-
-#     try:
-#         img = get_window_icon(window.hwnd)
-#         img.save("i.png")
-#     except Exception as e:
-#         print(f"Error: {e}")
-
-
-# if __name__ == "__main__":
-#     time.sleep(3)
-#     main()

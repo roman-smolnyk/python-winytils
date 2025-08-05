@@ -3,18 +3,16 @@ import os
 import threading
 import time
 
-from .workstation_events import WorkstationState
+from .workstation_events import WorkstationStateMonitor
 
 
 class FreezeDetector(threading.Thread):
 
-    def __init__(self, threshold=5, autostart=True):
+    def __init__(self, threshold=5):
         super().__init__(daemon=True)
         self._threshold = threshold
         self._frozen = False
         self._stop = False
-        if autostart:
-            self.start()
 
     def was_frozen(self) -> bool:
         _frozen = self._frozen
@@ -38,13 +36,23 @@ class FreezeDetector(threading.Thread):
 
 class Workstation:
     def __init__(self):
-        self._ws_state = WorkstationState()
+        self._ws_state_monitor = WorkstationStateMonitor()
         self._freeze_detector = FreezeDetector()
+    
+    def start_monitor(self):
+        self._ws_state_monitor.start()
+        self._freeze_detector.start()
+
+    def stop_monitor(self):
+        self._ws_state_monitor.stop()
+        self._freeze_detector.stop()
 
     def is_locked(self) -> bool:
-        return self._ws_state.is_locked()
+        """Requires started monitor"""
+        return self._ws_state_monitor.is_locked()
 
     def was_frozen(self) -> bool:
+        """Requires started monitor"""
         return self._freeze_detector.was_frozen()
 
     def shutdown(self, *, force=False, delay: int = None):

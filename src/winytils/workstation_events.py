@@ -147,7 +147,7 @@ class WorkstationEventsListener(threading.Thread):
         self.event_handlers[astuple(event)].append(handler)
 
 
-class WorkstationState:
+class WorkstationStateMonitor:
 
     def __init__(self):
         self.locked = False
@@ -156,19 +156,21 @@ class WorkstationState:
 
         self._ws_listener.on(LockEvent(), lambda e: setattr(self, "locked", True))
         self._ws_listener.on(UnlockEvent(), lambda e: setattr(self, "locked", False))
-
+    
+    def start(self):
         self._ws_listener.start()
+    
+    def stop(self):
+        self._ws_listener.stop()
 
     def is_locked(self) -> bool:
         return self.locked
 
-    def stop_listener(self):
-        self._ws_listener.stop()
-
 
 if __name__ == "__main__":
 
-    ws_state = WorkstationState()
+    ws_state = WorkstationStateMonitor()
+    ws_state.start()
     while True:
         print(ws_state.is_locked())
         time.sleep(1)
